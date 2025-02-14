@@ -26,6 +26,7 @@ DELIMITER = '|'
 TIMEOUT = (5,20) #connect,read
 CACHE_TIME = os.getenv("CACHE_TIME", 300) # default of 5mins
 CHUNKSIZE = 1024
+PREFIX_PATH = 'channels-samsung/'
 
 CACHE_DIR = os.path.join(gettempdir(), 'samsung-tvplus-for-channels')
 os.makedirs(CACHE_DIR, exist_ok=True)
@@ -114,6 +115,7 @@ class Handler(BaseHTTPRequestHandler):
         # Retrieve filters from URL or fallback to environment variables
         regions = [region.strip().lower() for region in (self._params.get('regions') or os.getenv('REGIONS', REGION_ALL)).split(DELIMITER)]
         regions = [region for region in all_channels.keys() if region.lower() in regions or REGION_ALL in regions]
+
         groups = [unquote(group).lower() for group in (self._params.get('groups') or os.getenv('GROUPS', '')).split(DELIMITER)]
         groups = [group for group in groups if group]
 
@@ -217,21 +219,21 @@ class Handler(BaseHTTPRequestHandler):
             <body>
                 <h1>Regions &amp; Groups</h1>
                 <h2>All</h2>
-                Playlist URL: <b><a href="http://{host}/{PLAYLIST_PATH}">http://{host}/{PLAYLIST_PATH}</a></b><br>
-                EPG URL (Set to refresh once per hour): <b><a href="http://{host}/{EPG_PATH}">http://{host}/{EPG_PATH}</a></b>
+                Playlist URL: <b><a href="http://{host}/{PREFIX_PATH}{PLAYLIST_PATH}">http://{host}/{PREFIX_PATH}{PLAYLIST_PATH}</a></b><br>
+                EPG URL (Set to refresh once per hour): <b><a href="http://{host}/{PREFIX_PATH}{EPG_PATH}">http://{host}/{PREFIX_PATH}{EPG_PATH}</a></b>
         '''.encode('utf8'))
 
         # Display regions and their group titles with links
         for region, region_data in self._app_data().items():
             encoded_region = quote(region)
             self.wfile.write(f'''<h2>{region_data["name"]}</h2>
-                             Playlist URL: <b><a href="http://{host}/{PLAYLIST_PATH}?regions={encoded_region}">http://{host}/{PLAYLIST_PATH}?regions={encoded_region}</a></b><br>
-                             EPG URL (Set to refresh once per hour): <b><a href="http://{host}/{EPG_PATH}?regions={encoded_region}">http://{host}/{EPG_PATH}?regions={encoded_region}</a></b><br><ul>'''.encode('utf8'))
+                             Playlist URL: <b><a href="http://{host}/{PREFIX_PATH}{PLAYLIST_PATH}?regions={encoded_region}">http://{host}/{PLAYLIST_PATH}?regions={encoded_region}</a></b><br>
+                             EPG URL (Set to refresh once per hour): <b><a href="http://{host}/{PREFIX_PATH}{EPG_PATH}?regions={encoded_region}">http://{host}/{EPG_PATH}?regions={encoded_region}</a></b><br><ul>'''.encode('utf8'))
 
             group_names = set(channel.get('group', None) for channel in region_data.get('channels', {}).values())
             for group in sorted(name for name in group_names if name):
                 encoded_group = quote(group)
-                self.wfile.write(f'<li><a href="http://{host}/{PLAYLIST_PATH}?regions={encoded_region}&groups={encoded_group}">{group}</a></li>'.encode('utf8'))
+                self.wfile.write(f'<li><a href="http://{host}/{PREFIX_PATH}{PLAYLIST_PATH}?regions={encoded_region}&groups={encoded_group}">{group}</a></li>'.encode('utf8'))
             self.wfile.write(b'</ul>')
 
         self.wfile.write(b'</body></html>')
