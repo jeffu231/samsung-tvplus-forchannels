@@ -2,16 +2,17 @@
 services:
   # Docker container home for this project: https://registry.hub.docker.com/r/matthuisman/samsung-tvplus-for-channels
   samsung-tvplus-for-channels:
-    #image: matthuisman/samsung-tvplus-for-channels
+    image: samsung-tvplus-for-channels
     build:
       context: https://github.com/matthuisman/samsung-tvplus-for-channels.git
+      #context: .
+      #dockerfile: ./Dockerfile
     container_name: samsung-tvplus-for-channels
     environment:
       - REGIONS=us
+      - GROUPS=Home & Food|Movies|Action & Drama|Motor Sports|Sports & Outdoor|Music|Life Stories & Culture|Animals Nature & History|Comedy|Ambiance
       - TZ=${TZ} # Add your local timezone in standard linux format. E.G. US/Eastern, US/Central, US/Mountain, US/Pacific, etc
     restart: unless-stopped
-    volumes:
-      - samsung-tvplus-for-channels:/usr/src/app
     networks:
       - traefik-net
     labels:
@@ -25,6 +26,4 @@ services:
 networks:
   traefik-net:
     external: true
-volumes:
-  samsung-tvplus-for-channels:
   
