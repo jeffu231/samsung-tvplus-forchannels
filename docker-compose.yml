@@ -1,10 +1,30 @@
+
 services:
-  samsung-tvplus:
-    container_name: samsung-tvplus
+  # Docker container home for this project: https://registry.hub.docker.com/r/matthuisman/samsung-tvplus-for-channels
+  samsung-tvplus-for-channels:
+    #image: matthuisman/samsung-tvplus-for-channels
+    build:
+      context: https://github.com/matthuisman/samsung-tvplus-for-channels.git
+    container_name: samsung-tvplus-for-channels
     environment:
-      - REGIONS=at|ca|ch|de|es|fr|gb|in|it|kr|us
-      - TZ=Pacific/Auckland
-    image: matthuisman/samsung-tvplus-for-channels
-    ports:
-      - 8182:80
+      - REGIONS=us
+      - TZ=${TZ} # Add your local timezone in standard linux format. E.G. US/Eastern, US/Central, US/Mountain, US/Pacific, etc
     restart: unless-stopped
+    volumes:
+      - samsung-tvplus-for-channels:/usr/src/app
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.channels-samsung-m3u.rule=Host(`docker01.home.kb9kld.org`) && (PathPrefix(`/channels-samsung/`))"
+      - "traefik.http.routers.channels-samsung-m3u.middlewares=channels-samsung-m3u"
+      - "traefik.http.middlewares.channels-samsung-m3u.stripprefix.prefixes=/channels-samsung"
+      - "traefik.http.middlewares.channels-samsung-m3u.stripprefix.forceSlash=false"
+      - traefik.http.services.channels-samsung-m3u.loadbalancer.server.port=80
+
+networks:
+  traefik-net:
+    external: true
+volumes:
+  samsung-tvplus-for-channels:
+  
