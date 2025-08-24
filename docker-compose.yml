@@ -10,7 +10,7 @@ services:
     container_name: samsung-tvplus-for-channels
     environment:
       - REGIONS=us
-      - GROUPS=Home & Food|Movies|Action & Drama|Motor Sports|Sports & Outdoor|Music|Life Stories & Culture|Animals Nature & History|Comedy|Ambiance
+      #- GROUPS=Home & Food|Movies|Action & Drama|Motor Sports|Sports & Outdoor|Music|Life Stories & Culture|Animals Nature & History|Comedy|Ambiance
       - TZ=${TZ} # Add your local timezone in standard linux format. E.G. US/Eastern, US/Central, US/Mountain, US/Pacific, etc
     restart: unless-stopped
     networks:
